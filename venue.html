@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AOCNR 2027 會場管理網頁</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f8fafc; }
+        .grid-cell { transition: all 0.2s; user-select: none; }
+        .grid-cell:hover { background-color: #f1f5f9; }
+        .grid-cell.selected { background-color: #bfdbfe; border: 2px solid #3b82f6; }
+        .grid-cell.booked { 
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .grid-cell.booked:hover {
+            opacity: 0.8;
+            filter: brightness(0.95);
+        }
+        .floor-plan-container { position: relative; display: inline-block; }
+        
+        /* 標記樣式 */
+        .marker {
+            position: absolute;
+            padding: 4px 8px;
+            background-color: rgba(17, 24, 39, 0.95);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            cursor: default;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 10;
+            white-space: nowrap;
+            pointer-events: none;
+            animation: pulse-border 2s infinite;
+        }
+        
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(79, 70, 229, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+        }
+
+        .purpose-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+        <!-- Header -->
+        <header class="bg-indigo-900 text-white p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">AOCNR 2027 會場管理系統</h1>
+                <p class="text-indigo-200 text-sm">Venue Management System - Single Page Interface</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="clearData()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-sm transition font-medium">清空所有預約</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="p-6 space-y-8">
+            
+            <!-- Date Tabs -->
+            <div class="flex flex-wrap gap-2 border-b pb-4" id="dateTabs">
+                <!-- Date tabs will be injected here -->
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+                
+                <!-- Left: Booking Grid -->
+                <div class="xl:col-span-8 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-lg font-bold flex items-center gap-2 text-slate-800">
+                            <i data-lucide="calendar" class="text-indigo-600"></i> 拖曳排程矩陣
+                        </h2>
+                        <span class="text-xs text-slate-500">提示：拖曳可選取多格，點擊已登記格子可刪除</span>
+                    </div>
+                    
+                    <div class="overflow-x-auto border rounded-xl bg-slate-50">
+                        <table class="w-full border-collapse" id="bookingGrid">
+                            <thead>
+                                <tr class="bg-slate-100">
+                                    <th class="border p-3 text-left text-sm font-semibold w-40 text-slate-600">場地 \ 時段</th>
+                                    <th class="border p-3 text-center text-sm font-semibold text-slate-600">上午</th>
+                                    <th class="border p-3 text-center text-sm font-semibold text-slate-600">中午</th>
+                                    <th class="border p-3 text-center text-sm font-semibold text-slate-600">下午</th>
+                                    <th class="border p-3 text-center text-sm font-semibold text-slate-600">晚上</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gridBody">
+                                <!-- Grid rows injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Right: Visual Map -->
+                <div class="xl:col-span-4 space-y-4">
+                    <h2 class="text-lg font-bold flex items-center gap-2 text-slate-800">
+                        <i data-lucide="map" class="text-indigo-600"></i> 場地視覺標記
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <div class="floor-group">
+                            <h3 class="text-sm font-bold text-slate-500 mb-2">1F 平面圖</h3>
+                            <div class="floor-plan-container w-full border rounded-lg bg-white p-2 text-center">
+                                <img src="https://drive.google.com/thumbnail?id=1Qc5BedStWTr3jShVD99Qj0q55aRu7FNh&sz=w1200" class="w-full h-auto rounded inline-block" alt="1F ">
+                                <div id="marker-1f-吉祥AB" class="marker" style="top: 50%; left: 30%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="floor-group">
+                            <h3 class="text-sm font-bold text-slate-500 mb-2">2F 平面圖</h3>
+                            <div class="floor-plan-container w-full border rounded-lg bg-white p-2 text-center">
+                                <img src="https://drive.google.com/thumbnail?id=1Eu_bGB6YIQTtft5u20CLIzOQidFIaVSi&sz=w1200" class="w-full h-auto rounded inline-block" alt="2F ">
+                                <div id="marker-2f-如意AB" class="marker" style="top: 50%; left: 30%;"></div>
+                                <div id="marker-2f-如意CDE" class="marker" style="top: 50%; left: 65%;"></div>
+                                <div id="marker-2f-公共空間" class="marker" style="top: 60%; left: 85%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="floor-group">
+                            <h3 class="text-sm font-bold text-slate-500 mb-2">3F 平面圖</h3>
+                            <div class="floor-plan-container w-full border rounded-lg bg-white p-2 text-center">
+                                <img src="https://drive.google.com/thumbnail?id=1JrGD6xRGlO5sSEfa7C5nKgxwaAXHBLw-&sz=w1200" class="w-full h-auto rounded inline-block" alt="3F ">
+                                <div id="marker-3f-圓滿A" class="marker" style="top: 50%; left: 20%;"></div>
+                                <div id="marker-3f-圓滿A廊道" class="marker" style="top: 80%; left: 60%;"></div>
+                                <div id="marker-3f-圓滿B" class="marker" style="top: 50%; left: 60%;"></div>
+                                <div id="marker-3f-公共空間" class="marker" style="top: 60%; left: 88%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Table -->
+            <div class="space-y-4">
+                <h2 class="text-lg font-bold flex items-center gap-2 text-slate-800">
+                    <i data-lucide="list" class="text-indigo-600"></i> 預約登記彙整表
+                </h2>
+                <div class="overflow-x-auto border rounded-xl shadow-sm">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-600 text-sm">
+                                <th class="p-3 border text-left">日期</th>
+                                <th class="p-3 border text-left">時段</th>
+                                <th class="p-3 border text-left">場地</th>
+                                <th class="p-3 border text-left">用途</th>
+                                <th class="p-3 border text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="text-sm">
+                            <!-- Rows will be injected -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-md overflow-hidden border border-white/20">
+            <div class="bg-indigo-900 p-4 text-white">
+                <h3 class="font-bold flex items-center gap-2"><i data-lucide="edit-3"></i> 登記租借用途</h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <div id="selectionSummary" class="text-sm text-slate-600 bg-slate-100 p-3 rounded-lg border">
+                    <!-- Dynamic Selection Info -->
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">選擇用途</label>
+                    <select id="purposeSelect" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="Lecture">Lecture</option>
+                        <option value="Luncheon">Luncheon</option>
+                        <option value="Hands-on">Hands-on</option>
+                        <option value="Coffee break">Coffee break</option>
+                        <option value="報到區">報到區</option>
+                        <option value="開幕式">開幕式</option>
+                        <option value="晚宴">晚宴</option>
+                        <option value="e-poster">e-poster</option>
+                        <option value="進場">進場</option>
+                        <option value="撤場">撤場</option>
+                        <option value="佔場">佔場</option>
+                    </select>
+                </div>
+                <div class="flex gap-2 pt-4">
+                    <button onclick="closeModal()" class="flex-1 px-4 py-2 border rounded-lg hover:bg-slate-50 transition font-medium">取消</button>
+                    <button onclick="saveBooking()" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium shadow-lg shadow-indigo-200">確認登記</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Constants & Data ---
+        const DATES = [
+            { id: "1103", label: "11/03 (三)" },
+            { id: "1104", label: "11/04 (四)" },
+            { id: "1105", label: "11/05 (五)" },
+            { id: "1106", label: "11/06 (六)" },
+            { id: "1107", label: "11/07 (日)" }
+        ];
+
+        const TIMES = ["上午", "中午", "下午", "晚上"];
+
+        const VENUES = [
+            { id: "1f-吉祥AB", label: "1F 吉祥A+B", floor: "1F" },
+            { id: "2f-如意AB", label: "2F 如意A+B", floor: "2F" },
+            { id: "2f-如意CDE", label: "2F 如意C+D+E", floor: "2F" },
+            { id: "2f-公共空間", label: "2F 公共空間", floor: "2F" },
+            { id: "3f-圓滿A", label: "3F 圓滿A", floor: "3F" },
+            { id: "3f-圓滿A廊道", label: "3F 圓滿A廊道", floor: "3F" },
+            { id: "3f-圓滿B", label: "3F 圓滿B", floor: "3F" },
+            { id: "3f-公共空間", label: "3F 公共空間", floor: "3F" }
+        ];
+
+        // 用途顏色配置
+        const PURPOSE_CONFIG = {
+            "Lecture": { bg: "bg-blue-100", text: "text-blue-700", border: "border-blue-400", hex: "#3b82f6" },
+            "Luncheon": { bg: "bg-orange-100", text: "text-orange-700", border: "border-orange-400", hex: "#f97316" },
+            "Hands-on": { bg: "bg-purple-100", text: "text-purple-700", border: "border-purple-400", hex: "#a855f7" },
+            "Coffee break": { bg: "bg-amber-100", text: "text-amber-700", border: "border-amber-400", hex: "#f59e0b" },
+            "報到區": { bg: "bg-cyan-100", text: "text-cyan-700", border: "border-cyan-400", hex: "#06b6d4" },
+            "開幕式": { bg: "bg-red-100", text: "text-red-700", border: "border-red-400", hex: "#ef4444" },
+            "晚宴": { bg: "bg-indigo-100", text: "text-indigo-700", border: "border-indigo-400", hex: "#6366f1" },
+            "e-poster": { bg: "bg-teal-100", text: "text-teal-700", border: "border-teal-400", hex: "#14b8a6" },
+            "進場": { bg: "bg-slate-200", text: "text-slate-700", border: "border-slate-400", hex: "#64748b" },
+            "撤場": { bg: "bg-gray-200", text: "text-gray-700", border: "border-gray-400", hex: "#9ca3af" },
+            "佔場": { bg: "bg-rose-100", text: "text-rose-700", border: "border-rose-400", hex: "#f43f5e" }
+        };
+
+        // State
+        let currentDayId = "1103";
+        let bookings = JSON.parse(localStorage.getItem('aocnr_bookings') || '[]');
+        let isDragging = false;
+        let selectionStart = null;
+        let selectedCells = [];
+
+        // --- Core Functions ---
+
+        function init() {
+            renderTabs();
+            renderGrid();
+            renderTable();
+            updateMarkers();
+            lucide.createIcons();
+            window.addEventListener('mouseup', handleGlobalMouseUp);
+        }
+
+        function renderTabs() {
+            const container = document.getElementById('dateTabs');
+            container.innerHTML = DATES.map(d => `
+                <button onclick="switchDay('${d.id}')" class="px-4 py-2 rounded-lg text-sm font-medium transition ${currentDayId === d.id ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+                    ${d.label}
+                </button>
+            `).join('');
+        }
+
+        function switchDay(dayId) {
+            currentDayId = dayId;
+            renderTabs();
+            renderGrid();
+            updateMarkers();
+        }
+
+        function renderGrid() {
+            const gridBody = document.getElementById('gridBody');
+            gridBody.innerHTML = VENUES.map(v => {
+                let cells = TIMES.map((t, idx) => {
+                    const booking = bookings.find(b => b.dayId === currentDayId && b.venueId === v.id && b.time === t);
+                    if (booking) {
+                        const config = PURPOSE_CONFIG[booking.purpose] || { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-400' };
+                        return `<td 
+                                    class="border p-3 grid-cell booked ${config.bg} ${config.text} border-l-4 ${config.border} text-xs font-bold"
+                                    onclick="deleteBooking('${currentDayId}', '${v.id}', '${t}')"
+                                    title="點擊刪除預約"
+                                >
+                                    <div class="flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> ${booking.purpose}</div>
+                                </td>`;
+                    }
+                    return `<td 
+                                class="border p-3 grid-cell text-center" 
+                                data-venue="${v.id}" 
+                                data-time="${t}"
+                                onmousedown="startSelection(event, '${v.id}', '${t}')"
+                                onmouseenter="updateSelection('${v.id}', '${t}')"
+                            ></td>`;
+                }).join('');
+                
+                return `<tr>
+                    <td class="border p-3 bg-slate-50 font-medium text-slate-700 text-sm">${v.label}</td>
+                    ${cells}
+                </tr>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            if (bookings.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 italic">目前尚無預約資料</td></tr>`;
+                return;
+            }
+
+            const sorted = [...bookings].sort((a,b) => a.dayId.localeCompare(b.dayId) || a.venueId.localeCompare(b.venueId));
+
+            tbody.innerHTML = sorted.map((b, idx) => {
+                const config = PURPOSE_CONFIG[b.purpose] || { bg: 'bg-indigo-100', text: 'text-indigo-700' };
+                return `
+                    <tr class="hover:bg-slate-50 transition border-b">
+                        <td class="p-3">${DATES.find(d => d.id === b.dayId)?.label}</td>
+                        <td class="p-3">${b.time}</td>
+                        <td class="p-3 font-medium text-slate-700">${VENUES.find(v => v.id === b.venueId)?.label}</td>
+                        <td class="p-3">
+                            <span class="px-2 py-1 ${config.bg} ${config.text} rounded-full text-xs font-bold border ${config.border || ''}">
+                                ${b.purpose}
+                            </span>
+                        </td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteBooking('${b.dayId}','${b.venueId}','${b.time}')" class="text-red-400 hover:text-red-600 transition p-1">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function updateMarkers() {
+            document.querySelectorAll('.marker').forEach(m => {
+                m.style.display = 'none';
+                m.innerHTML = '';
+            });
+            
+            VENUES.forEach(v => {
+                const dayBookings = bookings.filter(b => b.dayId === currentDayId && b.venueId === v.id);
+                
+                if (dayBookings.length > 0) {
+                    const marker = document.getElementById(`marker-${v.id}`);
+                    if (marker) {
+                        const content = dayBookings
+                            .sort((a, b) => TIMES.indexOf(a.time) - TIMES.indexOf(b.time))
+                            .map(b => {
+                                const config = PURPOSE_CONFIG[b.purpose];
+                                return `<div class="leading-tight flex items-center mb-0.5">
+                                    <span class="purpose-dot" style="background-color: ${config.hex}"></span>
+                                    <span>${b.time}: ${b.purpose}</span>
+                                </div>`;
+                            })
+                            .join('');
+                        
+                        marker.innerHTML = content;
+                        marker.style.display = 'block';
+                    }
+                }
+            });
+        }
+
+        // --- Interaction Handlers ---
+
+        function startSelection(e, venueId, time) {
+            if (e.currentTarget.classList.contains('booked')) return;
+            isDragging = true;
+            selectionStart = { venueId, time };
+            clearSelection();
+            e.currentTarget.classList.add('selected');
+            selectedCells = [{ venueId, time }];
+        }
+
+        function updateSelection(venueId, time) {
+            if (!isDragging) return;
+            
+            const vIndexStart = VENUES.findIndex(v => v.id === selectionStart.venueId);
+            const vIndexCurrent = VENUES.findIndex(v => v.id === venueId);
+            const tIndexStart = TIMES.indexOf(selectionStart.time);
+            const tIndexCurrent = TIMES.indexOf(time);
+
+            const vMin = Math.min(vIndexStart, vIndexCurrent);
+            const vMax = Math.max(vIndexStart, vIndexCurrent);
+            const tMin = Math.min(tIndexStart, tIndexCurrent);
+            const tMax = Math.max(tIndexStart, tIndexCurrent);
+
+            clearSelection();
+            selectedCells = [];
+
+            const cells = document.querySelectorAll('.grid-cell:not(.booked)');
+            cells.forEach(cell => {
+                const vId = cell.getAttribute('data-venue');
+                const t = cell.getAttribute('data-time');
+                const vIdx = VENUES.findIndex(v => v.id === vId);
+                const tIdx = TIMES.indexOf(t);
+
+                if (vIdx >= vMin && vIdx <= vMax && tIdx >= tMin && tIdx <= tMax) {
+                    cell.classList.add('selected');
+                    selectedCells.push({ venueId: vId, time: t });
+                }
+            });
+        }
+
+        function handleGlobalMouseUp() {
+            if (isDragging) {
+                isDragging = false;
+                if (selectedCells.length > 0) {
+                    showModal();
+                }
+            }
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('selected'));
+        }
+
+        function showModal() {
+            const modal = document.getElementById('bookingModal');
+            const summary = document.getElementById('selectionSummary');
+            
+            const dateStr = DATES.find(d => d.id === currentDayId).label;
+            const venueNames = [...new Set(selectedCells.map(c => VENUES.find(v => v.id === c.venueId).label))].join(', ');
+            const timeNames = [...new Set(selectedCells.map(c => c.time))].join(', ');
+
+            summary.innerHTML = `
+                <p><strong>日期：</strong> ${dateStr}</p>
+                <p><strong>場地：</strong> ${venueNames}</p>
+                <p><strong>時段：</strong> ${timeNames}</p>
+            `;
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('bookingModal').classList.add('hidden');
+            clearSelection();
+            selectedCells = [];
+        }
+
+        function saveBooking() {
+            const purpose = document.getElementById('purposeSelect').value;
+            
+            selectedCells.forEach(cell => {
+                if (!bookings.some(b => b.dayId === currentDayId && b.venueId === cell.venueId && b.time === cell.time)) {
+                    bookings.push({
+                        dayId: currentDayId,
+                        venueId: cell.venueId,
+                        time: cell.time,
+                        purpose: purpose
+                    });
+                }
+            });
+
+            localStorage.setItem('aocnr_bookings', JSON.stringify(bookings));
+            closeModal();
+            renderGrid();
+            renderTable();
+            updateMarkers();
+        }
+
+        function deleteBooking(dayId, venueId, time) {
+            bookings = bookings.filter(b => !(b.dayId === dayId && b.venueId === venueId && b.time === time));
+            localStorage.setItem('aocnr_bookings', JSON.stringify(bookings));
+            renderTable();
+            renderGrid();
+            updateMarkers();
+        }
+
+        function clearData() {
+            if(confirm('確定要刪除所有預約登記嗎？此操作無法還原。')) {
+                bookings = [];
+                localStorage.removeItem('aocnr_bookings');
+                renderGrid();
+                renderTable();
+                updateMarkers();
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
