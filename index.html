@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AOCNR 2027 Taipei - Asian-Oceanian Congress of Neuroradiology</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'aocnr-purple': '#5a2a4a', /* Extracted from flyer footer (深紫紅) */
+                        'aocnr-gold': '#faa64b',   /* Extracted from sunset (夕陽金) */
+                        'aocnr-blue': '#60a5fa',   /* Extracted from box border (天空藍) */
+                    },
+                    fontFamily: {
+                        'sans': ['"Noto Sans TC"', 'sans-serif'],
+                        'serif': ['"Playfair Display"', 'serif'],
+                        'script': ['"Great Vibes"', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hero-bg {
+            /* Placeholder for the Taipei Sunset image */
+            background-image: linear-gradient(rgba(90, 42, 74, 0.4), rgba(90, 42, 74, 0.6)), url('https://images.unsplash.com/photo-1470004914212-05527e49370b?q=80&w=2674&auto=format&fit=crop'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        /* Style for the donation button copy alert, replacing standard alert() */
+        #copy-alert {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-700 bg-gray-50">
+
+    <!-- Custom Alert/Toast for copy function (replaces alert()) -->
+    <div id="copy-alert" class="fixed bottom-5 right-5 bg-aocnr-purple text-white px-6 py-3 rounded-lg shadow-xl opacity-0 translate-y-4 pointer-events-none z-[100]">
+        <i class="fas fa-check-circle mr-2"></i> 帳號已複製成功！
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <!-- Logo text simulating the brand -->
+                <div class="text-2xl font-bold text-aocnr-purple tracking-wider">
+                    AOCNR <span class="text-aocnr-gold">2027</span>
+                </div>
+            </div>
+            <div class="hidden md:flex space-x-8 text-sm font-medium uppercase tracking-widest text-gray-600">
+                <a href="#about" class="hover:text-aocnr-purple transition">About</a>
+                <a href="#venue" class="hover:text-aocnr-purple transition">Venue</a>
+                <a href="#gallery" class="hover:text-aocnr-purple transition">Gallery</a>
+                <a href="#donation" class="hover:text-aocnr-purple transition">Sponsorship</a>
+            </div>
+            <a href="#donation" class="hidden md:block bg-aocnr-purple text-white px-6 py-2 rounded-full text-sm hover:bg-opacity-90 transition shadow-lg">
+                Donate Now
+            </a>
+            <!-- Mobile Menu Button (Icon only for visual) -->
+            <button class="md:hidden text-aocnr-purple text-2xl">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-bg h-screen flex items-center justify-center text-center px-4 relative">
+        <div class="text-white max-w-4xl animate-fade-in-up">
+            <p class="font-script text-4xl md:text-6xl text-aocnr-gold mb-4 text-shadow">Welcome</p>
+            <h1 class="text-5xl md:text-7xl font-bold mb-2 tracking-tight text-shadow">
+                16<sup>th</sup> AOCNR
+            </h1>
+            <h2 class="text-4xl md:text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-aocnr-gold drop-shadow-lg">
+                TAIPEI 2027
+            </h2>
+            <h3 class="text-xl md:text-3xl font-light tracking-widest mb-8 border-t border-b border-white/30 py-4 inline-block text-shadow">
+                Asian-Oceanian Congress of Neuroradiology <br>亞洲太平洋神經放射線會議
+            </h3>          
+            <div class="flex flex-col md:flex-row justify-center items-center gap-6 mt-8">
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-lg min-w-[200px]">
+                    <i class="far fa-calendar-alt text-2xl mb-2 text-aocnr-gold"></i>
+                    <p class="text-lg font-semibold">November 4-7, 2027</p>
+                    <p class="text-sm opacity-80">Thursday - Sunday</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-lg min-w-[200px]">
+                    <i class="fas fa-map-marker-alt text-2xl mb-2 text-aocnr-gold"></i>
+                    <p class="text-lg font-semibold">Hilton Taipei Sinban</p>
+                    <p class="text-sm opacity-80">Taipei, Taiwan</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scroll Down Indicator -->
+        <div class="absolute bottom-10 animate-bounce">
+            <a href="#about" class="text-white text-2xl opacity-70 hover:opacity-100">
+                <i class="fas fa-chevron-down"></i>
+            </a>
+        </div>
+    </header>
+
+
+    <!-- Donation Info Section -->
+    <section id="donation" class="py-20 bg-aocnr-purple text-white relative">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-3xl md:text-4xl font-serif font-bold mb-8">捐款與匯款資訊</h2>
+                <p class="mb-10 text-lg text-gray-200">支持亞洲太平洋神經放射線會議，共創醫療未來。</p>
+                
+                <div class="bg-white text-gray-800 rounded-lg shadow-2xl p-8 md:p-12 transform hover:-translate-y-1 transition duration-300">
+                    <div class="grid md:grid-cols-2 gap-8 text-left">
+                        <div class="space-y-4 border-b md:border-b-0 md:border-r border-gray-200 pb-4 md:pb-0">
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">戶名 Account Name</p>
+                                <p class="text-xl font-bold text-aocnr-purple">中華民國神經放射線醫學會</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">銀行 Bank Name</p>
+                                <p class="text-lg">006 合作金庫銀行</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">分行 Branch</p>
+                                <p class="text-lg">1427 石牌分行</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col justify-center">
+                            <p class="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2">帳號 Account Number</p>
+                            <div class="bg-gray-100 p-4 rounded text-center md:text-left">
+                                <p class="text-2xl md:text-3xl font-mono font-bold text-gray-700 tracking-wider">1427-765-460-813</p>
+                            </div>
+                            <button onclick="copyToClipboard('1427765460813')" class="mt-4 text-sm text-aocnr-blue hover:text-aocnr-purple font-semibold flex items-center justify-center md:justify-start">
+                                <i class="far fa-copy mr-2"></i> 點擊複製帳號
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- President's Message Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/3 flex justify-center">
+                    <div class="relative">
+                        <!-- Decorative border box -->
+                        <div class="absolute inset-0 border-4 border-aocnr-gold transform translate-x-4 translate-y-4 rounded-lg"></div>
+                        <!-- President's photo -->
+                        <div class="relative w-64 h-80 bg-gray-200 rounded-lg overflow-hidden shadow-xl flex items-center justify-center">
+                            <!-- Image Source for Dr. Feng-Chi Chang -->
+                            <img src="images/fcchang.jpg" alt="Dr. Feng-Chi Chang (張豐基)" class="absolute inset-0 w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-2/3 text-center md:text-left">
+                    <h4 class="text-aocnr-gold font-bold uppercase tracking-widest mb-2">Welcome Message / 歡迎詞</h4>
+                    <h2 class="text-3xl md:text-4xl font-serif text-aocnr-purple font-bold mb-6">
+                        大會主席致詞
+                    </h2>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">大會主席: 張豐基 (Feng-Chi Chang)</h3>
+                    
+                    <!-- Chinese Message -->
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        各位神經學及神經影像的專家及朋友大家好：
+                    </p>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        個人謹代表大會，誠摯的邀請您參加 2027 年在台北舉辦的第 16 屆亞洲太平洋神經放射線會議。
+                    </p>
+                    <p class="text-gray-600 leading-relaxed mb-6">
+                        台北是一個傳統與科技，文化與美食互相融會的新興都市，在巡禮參與會議可讓您充分的體驗到這個都市的充沛活力，而這場盛會也會邀請到全球頂尖的神經學及神經影像的專家，共同探究及分享神經放射性學的最新進展與創新。我們誠摯邀請您參加我們的活動及會議，體驗這場豐富的學術與文化交流，熱切期待在台北迎接您的蒞臨。
+                    </p>
+
+                    <hr class="my-6 border-gray-200">
+
+                    <!-- English Message -->
+                    <p class="text-gray-500 italic leading-relaxed mb-4">
+                        Dear colleagues and friends,
+                    </p>
+                    <p class="text-gray-500 italic leading-relaxed mb-4">
+                        On behalf of the Organizing Committee, it is my great pleasure to invite you to the 16th Asian-Oceanian Congress of Neuroradiology (AOCNR), which will be held in the vibrant city of Taipei, Taiwan, in 2027.
+                    </p>
+                    <p class="text-gray-500 italic leading-relaxed mb-6">
+                        Taipei is not only a meeting point of technology and culture but also a capital of gourmet food, allowing you to fully enjoy the city's warmth and convenience alongside your academic exchange. This prestigious event promises to bring together leading experts, researchers, and practitioners from around the globe to share the latest advancements and innovations in the field of neuroradiology. Join us to experience this rich academic and cultural exchange. We look forward to welcoming you to Taipei!
+                    </p>
+                    <p class="text-gray-500 italic leading-relaxed mb-4">
+                        Warm regards,
+                    </p>
+                    
+                    <div class="mt-8 pt-4 border-t border-gray-200">
+                        <!-- Signature -->
+                        <img src="images/sign.png" alt="Signature" class="h-12 opacity-80 mx-auto md:mx-0 mb-2">
+                        <p class="font-bold text-gray-800">Feng-Chi Chang (張豐基)</p>
+                        <p class="text-sm text-gray-600">Congress President, 2027 Taipei AOCNR</p>
+                        <p class="text-sm text-gray-600">President, Neuroradiologic Society of Taiwan (中華民國神經放射線醫學會 理事長)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Venue Section -->
+    <section id="venue" class="py-20 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-serif text-aocnr-purple font-bold">Venue Information</h2>
+                <div class="w-24 h-1 bg-aocnr-gold mx-auto mt-4"></div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+                <div class="md:w-1/2 h-80 md:h-auto relative">
+                    <!-- Venue Image Placeholder (Hilton Taipei Sinban) -->
+                    <img src="images/hilton.jpg" alt="Hilton Taipei Sinban" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+                        <div class="text-white">
+                            <h3 class="text-2xl font-bold">Hilton Taipei Sinban</h3>
+                            <p>新板希爾頓酒店</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2 p-10 flex flex-col justify-center">
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4 text-aocnr-purple">
+                                <i class="fas fa-map-marked-alt text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Location</h4>
+                                <p class="text-gray-600">No. 88, Minquan Rd, Banqiao District, <br>New Taipei City, Taiwan 220<br>新北市板橋區民權路88號<br>220 台灣新北市</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4 text-aocnr-purple">
+                                <i class="fas fa-subway text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Transport</h4>
+                                <p class="text-gray-600">Near Banqiao Station (High Speed Rail / MRT / Train) <br>近板橋站 (高鐵/台鐵/捷運)</p>
+                            </div>
+                        </div>
+                        <div class="pt-4">
+                            <a href="https://maps.app.goo.gl/k1V3P" target="_blank" class="inline-block border-2 border-aocnr-purple text-aocnr-purple hover:bg-aocnr-purple hover:text-white px-6 py-2 rounded transition duration-300 font-medium">
+                                View on Google Maps
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Photo Gallery Section -->
+    <section id="gallery" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-serif text-aocnr-purple font-bold">Highlights & Gallery</h2>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Using images from the Google Drive folder -->
+                <!-- Image 1 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/1.jpeg" loading="lazy" alt="Gallery Image 1" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <!-- Image 2 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/2.jpeg" loading="lazy" alt="Gallery Image 2" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <!-- Image 3 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/3.jpeg" loading="lazy" alt="Gallery Image 3" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                 <!-- Image 4 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/4.jpeg" loading="lazy" alt="Gallery Image 4" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                 <!-- Image 5 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/5.jpeg" loading="lazy" alt="Gallery Image 5" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                 <!-- Image 6 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/6.jpeg" loading="lazy" alt="Gallery Image 6" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                 <!-- Image 7 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/7.jpeg" loading="lazy" alt="Gallery Image 7" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                 <!-- Image 8 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/8.jpeg" loading="lazy" alt="Gallery Image 8" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <!-- Image 9 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/9.jpeg" loading="lazy" alt="Gallery Image 9" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <!-- Image 10 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/10.jpeg" loading="lazy" alt="Gallery Image 10" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <!-- Image 11 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/11.jpeg" loading="lazy" alt="Gallery Image 11" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <!-- Image 12 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/12.jpeg" loading="lazy" alt="Gallery Image 12" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <!-- Image 13 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/13.jpeg" loading="lazy" alt="Gallery Image 13" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <!-- Image 14 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/14.jpeg" loading="lazy" alt="Gallery Image 14" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+				<!-- Image 15 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/15.jpeg" loading="lazy" alt="Gallery Image 14" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+				<!-- Image 16 -->
+                <div class="relative group overflow-hidden rounded-lg cursor-pointer h-48 md:h-64">
+                    <img src="images/16.jpeg" loading="lazy" alt="Gallery Image 14" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-12 border-t border-gray-800">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0 text-center md:text-left">
+                    <h3 class="text-2xl font-bold text-white">AOCNR 2027</h3>
+                    <p class="mt-2 text-sm">ASIAN-OCEANIAN CONGRESS OF NEURORADIOLOGY</p>
+                </div>
+                <div class="flex space-x-6 text-sm">
+					<a href="tel:+886228712121" class="hover:text-aocnr-gold transition flex items-center">
+                        <i class="fas fa-barcode mr-2"></i> 統編: 92023640
+                    </a>
+                    <a href="http://www.nrst.tw/" target="_blank" class="hover:text-aocnr-gold transition flex items-center">
+                        <i class="fas fa-globe mr-2"></i> www.nrst.tw
+                    </a>
+                    <a href="mailto:nrst.taiwan@gmail.com" class="hover:text-aocnr-gold transition flex items-center">
+                        <i class="fas fa-envelope mr-2"></i> nrst.taiwan@gmail.com
+                    </a>
+					<a href="tel:+886228712121" class="hover:text-aocnr-gold transition flex items-center">
+                        <i class="fas fa-phone mr-2"></i> (02)2871-2121 #27357
+                    </a>
+                </div>
+            </div>
+            <hr class="border-gray-800 my-8">
+            <div class="text-center text-xs text-gray-500">
+                &copy; 2027 AOCNR Taipei. All Rights Reserved. Designed for AOCNR 2027.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function copyToClipboard(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            
+            // Replaced alert() with custom toast/alert
+            const alertElement = document.getElementById('copy-alert');
+            alertElement.style.opacity = '1';
+            alertElement.style.transform = 'translateY(0)';
+
+            // Hide after 3 seconds
+            setTimeout(() => {
+                alertElement.style.opacity = '0';
+                alertElement.style.transform = 'translateY(40px)';
+            }, 3000);
+        }
+
+        // Fix: Removed window.alert() usage for better UX in the iFrame environment.
+        // Also added English labels to the donation section for completeness.
+        // The original code used alert(), which is forbidden. I've replaced it with a custom toast element.
+    </script>
+</body>
+</html>
